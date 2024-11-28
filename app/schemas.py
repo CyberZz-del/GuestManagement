@@ -94,6 +94,31 @@ class Event(EventBase):
     class Config:
         from_attributes = True
 
+# Admin模型
+class AdminBase(UserBase):
+    email: EmailStr
+
+class AdminCreate(AdminBase):
+    password: str  # 用于创建时的明文密码
+
+class Admin(AdminBase):
+    id: int
+    type: str = "admin"
+
+    class Config:
+        from_attributes = True
+
 # 更新循环引用 - 使用新的model_rebuild方法
 Guest.model_rebuild()
 CommitteeMember.model_rebuild()
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    email: Optional[str] = None
+
+class AdminLogin(BaseModel):
+    email: EmailStr
+    password: str

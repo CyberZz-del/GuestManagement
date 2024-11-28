@@ -77,6 +77,17 @@ class CommitteeMember(User):
         'polymorphic_on': team_type
     }
 
+class Admin(User):
+    __tablename__ = "admins"
+
+    id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    email = Column(String(100), unique=True, nullable=False)
+    hashed_password = Column(String(100), nullable=False)
+    
+    __mapper_args__ = {
+        'polymorphic_identity': 'admin',
+    }
+
 class Event(Base):
     __tablename__ = "events"
 

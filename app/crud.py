@@ -2,6 +2,33 @@ from sqlalchemy.orm import Session
 from . import models, schemas
 from fastapi import HTTPException
 from typing import List, Optional
+from .security import verify_password, get_password_hash
+
+# Admin CRUD operations
+def get_admin_by_email(db: Session, email: str):
+    return db.query(models.Admin).filter(models.Admin.email == email).first()
+
+def authenticate_admin(db: Session, email: str, password: str):
+    admin = get_admin_by_email(db, email)
+    if not admin:
+        return False
+    if not verify_password(password, admin.hashed_password):
+        return False
+    return admin
+
+def create_admin(db: Session, admin: schemas.AdminCreate):
+    hashed_password = get_password_hash(admin.password)
+    db_admin = models.Admin(
+        email=admin.email,
+        name=admin.name,
+        gender=admin.gender,
+        contact=admin.contact,
+        hashed_password=hashed_password
+    )
+    db.add(db_admin)
+    db.commit()
+    db.refresh(db_admin)
+    return db_admin
 
 # User CRUD operations
 def get_user(db: Session, user_id: int):
