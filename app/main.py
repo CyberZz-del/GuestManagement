@@ -9,12 +9,29 @@ from typing import Optional
 from sqlalchemy.orm import Session
 from typing import List
 from . import models, schemas, crud
-from .database import engine, get_db
+from .database import engine, get_db, SessionLocal
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Guest Management System")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    db = SessionLocal()
+    admin = crud.get_admin_by_email(db, email="123@admin.com")
+    if not admin:
+        admin_data = schemas.AdminCreate(
+            email="123@admin.com",
+            password="123",
+            name="Default Admin",
+            gender=None,
+            contact=None
+        )
+        crud.create_admin(db=db, admin=admin_data)
+    db.close()
+    yield
+
+app = FastAPI(title="Guest Management System", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
