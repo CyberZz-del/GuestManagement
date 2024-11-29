@@ -19,7 +19,7 @@
     ```
 2. 安装所需的依赖项：
     ```bash
-    npm install
+    npm install --force
     pip install -r requirements.txt
     ```
 3. 配置数据库连接：
